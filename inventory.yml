@@ -1,0 +1,22 @@
+---
+webservers:
+  hosts:
+    uberserver:
+      ansible_connection: ssh
+      ansible_host: 'rheinhart.uberlegenheit.ru'
+      ansible_port: 2216
+  vars:
+    ansible_user: 'root'
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_private_key_file: "{{ private_key }}"
+
+vpnservers:
+  hosts:
+    electronicpanacea:
+      ansible_connection: ssh
+      ansible_host: 164.92.237.22
+      ansible_port: 22
+  vars:
+    ansible_user: 'root'
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_private_key_file: "{{ private_key }}"
