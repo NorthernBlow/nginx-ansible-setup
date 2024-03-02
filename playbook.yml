@@ -3,9 +3,24 @@
 - name: Installing Nginx server
   hosts: all
   tasks:
-   - name: Ping my hosts
-     ansible.builtin.ping:
 
-   - name: Print message
-     ansible.builtin.debug:
-      msg: Hello world
+
+    - name: Обновление системы
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: yes
+
+
+
+
+    - name: Убедиться что нжинкс последней версии
+      ansible.builtin.apt:
+        name: nginx
+        state: latest
+        install_recommends: yes
+        allow_downgrade: no
+
+
+    - name: Print message
+      ansible.builtin.debug:
+        msg: Hello world
