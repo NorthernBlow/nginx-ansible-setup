@@ -17,12 +17,14 @@
         allow_downgrade: false
 
     - name: Установка конфига нжинкс
-      ansible.builtin.template:
-        src: ./src/uberserver/nginx/sites-available/sitename.conf
+      ansible.builtin.copy:
+        src: src/uberserver/nginx/sites-available/sitename.conf
         dst: /etc/nginx/sites-available/
-        mode: '0644'
+        mode: '644'
         owner: root
         group: root
+        # форсируем, чтобы затереть дефолтные конфиги.
+        force: true
         notify: restart nginx
 
     - name: Создать симлинк на рабочий сайт
