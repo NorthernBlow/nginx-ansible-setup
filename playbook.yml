@@ -4,22 +4,28 @@
   hosts: all
   tasks:
 
-
     - name: Обновление системы
       ansible.builtin.apt:
+        update_cache: true
         upgrade: dist
-        update_cache: yes
-
-
-
 
     - name: Убедиться что нжинкс последней версии
       ansible.builtin.apt:
         name: nginx
-        state: latest
-        install_recommends: yes
-        allow_downgrade: no
+        state: present
+        install_recommends: true
+        allow_downgrade: false
 
+    - name: Установка конфига нжинкс
+      ansible.builtin.template:
+        src: src/uberserver/nginx/sites-available/sitename.conf
+        dst: /etc/nginx/sites-available/
+        notify: restart nginx
+
+    - name: УБедиться что нжинкс стартанул
+      ansible.builtin.service:
+        name: nginx
+        state: started
 
     - name: Print message
       ansible.builtin.debug:
