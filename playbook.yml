@@ -18,9 +18,24 @@
 
     - name: Установка конфига нжинкс
       ansible.builtin.template:
-        src: src/uberserver/nginx/sites-available/sitename.conf
+        src: ./src/uberserver/nginx/sites-available/sitename.conf
         dst: /etc/nginx/sites-available/
+        mode: '0644'
+        owner: root
+        group: root
         notify: restart nginx
+
+    - name: Создать симлинк на рабочий сайт
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/sitename.conf
+        dst: /etc/nginx/sites-enabled/sitename.conf
+        state: link
+        force: false
+
+    - name: Перезагрузить нжинкс для применения конфигурации
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
 
     - name: УБедиться что нжинкс стартанул
       ansible.builtin.service:
