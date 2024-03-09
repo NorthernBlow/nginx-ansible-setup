@@ -65,7 +65,7 @@
     
     - name: Всеотец
       ansible.builtin.shell: 
-        cmd: 'certbot certonly --email {{ email }} --agree-tos True --non-interactive True --preffered-challenges http -d "{{ item }}"'
+        cmd: 'certbot certonly --email {{ email }} --agree-tos True --non-interactive True --preffered-challenges http -d "{{ domain }}"'
       register: certbot_output
 
     - name: Вывод сертбота
