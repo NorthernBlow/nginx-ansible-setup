@@ -2,12 +2,15 @@
 
 - name: Installing Nginx server
   hosts: all
+  gather_facts: true
+  gather_subset: [all, virtual]
   vars:
+    server: "{{ inventory_hostname }}"
     email: "root@rooted.onion"
-    fqdns: 
-      - rheinhart.uberlegenheit.ru
-      - northernblow.uberlegenheit.ru
     cli_certbot_path: "/etc/letsencrypt/cli.ini"
+
+  vars_files:
+    - "vars/{{ server }}.yml"
 
   tasks:
 
@@ -63,9 +66,6 @@
     - name: Всеотец
       ansible.builtin.shell: 
         cmd: 'certbot certonly --email {{ email }} --agree-tos True --non-interactive True --preffered-challenges http -d "{{ item }}"'
-      loop:
-        - rheinhart.uberlegenheit.ru
-        - northernblow.uberlegenheit.ru
       register: certbot_output
 
     - name: Вывод сертбота
