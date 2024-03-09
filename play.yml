@@ -1,0 +1,13 @@
+---
+### тест циклов ################################################################
+- name: Print each item
+  hosts: all
+
+  tasks:
+    - name:
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+        loop:
+          - one
+          - two
+          - three

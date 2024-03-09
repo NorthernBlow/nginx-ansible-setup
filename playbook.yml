@@ -2,6 +2,13 @@
 
 - name: Installing Nginx server
   hosts: all
+  vars:
+    email: "root@rooted.onion"
+    fqdns: 
+      - rheinhart.uberlegenheit.ru
+      - northernblow.uberlegenheit.ru
+    cli_certbot_path: "/etc/letsencrypt/cli.ini"
+
   tasks:
 
     - name: Обновление системы
@@ -19,7 +26,7 @@
     - name: Установка конфига нжинкс
       ansible.builtin.copy:
         src: src/uberserver/nginx/sites-available/sitename.conf
-        dst: /etc/nginx/sites-available/
+        dest: /etc/nginx/sites-available/
         mode: '644'
         owner: root
         group: root
@@ -30,19 +37,63 @@
     - name: Создать симлинк на рабочий сайт
       ansible.builtin.file:
         src: /etc/nginx/sites-available/sitename.conf
-        dst: /etc/nginx/sites-enabled/sitename.conf
+        dest: /etc/nginx/sites-enabled/sitename.conf
+        mode: '644'
+        owner: root
+        group: root
         state: link
-        force: false
+        force: true
 
     - name: Перезагрузить нжинкс для применения конфигурации
       ansible.builtin.service:
         name: nginx
         state: reloaded
 
-    - name: УБедиться что нжинкс стартанул
+    - name: Убедиться что нжинкс стартанул
       ansible.builtin.service:
         name: nginx
         state: started
+
+    - name: Установка certbot
+      ansible.builtin.apt:
+        name: python3-certbot-nginx
+        state: present
+        install_recommends: true
+    
+    - name: Всеотец
+      ansible.builtin.shell: 
+        cmd: 'certbot certonly --email {{ email }} --agree-tos True --non-interactive True --preffered-challenges http -d "{{ item }}"'
+      loop:
+        - rheinhart.uberlegenheit.ru
+        - northernblow.uberlegenheit.ru
+      register: certbot_output
+
+    - name: Вывод сертбота
+      ansible.builtin.debug:
+        var: certbot_output.results
+
+
+    - name: Копирование systemd демонов сертбота
+      ansible.builtin.copy:
+        src: /home/northernblow/prog/vm-setup/src/uberserver/systemd/
+        dest: /etc/systemd/system/
+        mode: '644'
+        owner: root
+        group: root
+        force: true
+
+    - name: Запуск демонов сертбота
+      ansible.builtin.service:
+        name: certbot-semi-automatic
+        enabled: true
+        state: started
+
+    - name: Запуск таймера сертбота
+      ansible.builtin.service:
+        name: certbot-semi-automatic.timer
+        enabled: true
+        state: started
+
 
     - name: Print message
       ansible.builtin.debug:
