@@ -37,6 +37,14 @@
         force: true
         notify: restart nginx
 
+    - name: Деплой сайта
+      ansible.builtin.copy:
+        src: src/uberserver/nginx/var/www/html/MortherfuckingWebsite.html
+        dest: /var/www/html/
+        mode: '644'
+        owner: root
+        group: root
+
     - name: Создать симлинк на рабочий сайт
       ansible.builtin.file:
         src: /etc/nginx/sites-available/sitename.conf
@@ -72,7 +80,6 @@
       ansible.builtin.debug:
         var: certbot_output.results
 
-
     - name: Копирование systemd демонов сертбота
       ansible.builtin.copy:
         src: /home/northernblow/prog/vm-setup/src/uberserver/systemd/
@@ -93,7 +100,6 @@
         name: certbot-semi-automatic.timer
         enabled: true
         state: started
-
 
     - name: Print message
       ansible.builtin.debug:
