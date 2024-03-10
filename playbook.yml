@@ -26,24 +26,32 @@
         install_recommends: true
         allow_downgrade: false
 
+    - name: Основной конфиг нжинкс
+      ansible.builtin.copy:
+        src: files/uberserver/nginx/nginx.conf
+        dest: /etc/nginx/
+
     - name: Установка конфига нжинкс
       ansible.builtin.copy:
-        src: src/uberserver/nginx/sites-available/sitename.conf
+        src: files/uberserver/nginx/sites-available/sitename.conf
         dest: /etc/nginx/sites-available/
         mode: '644'
         owner: root
         group: root
         # форсируем, чтобы затереть дефолтные конфиги.
-        force: true
-        notify: restart nginx
 
     - name: Деплой сайта
       ansible.builtin.copy:
-        src: src/uberserver/nginx/var/www/html/MortherfuckingWebsite.html
+        src: files/uberserver/nginx/var/www/html/
         dest: /var/www/html/
         mode: '644'
         owner: root
         group: root
+
+    - name: Удалить дефолтный симлинк
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
 
     - name: Создать симлинк на рабочий сайт
       ansible.builtin.file:
@@ -53,17 +61,6 @@
         owner: root
         group: root
         state: link
-        force: true
-
-    - name: Перезагрузить нжинкс для применения конфигурации
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded
-
-    - name: Убедиться что нжинкс стартанул
-      ansible.builtin.service:
-        name: nginx
-        state: started
 
     - name: Установка certbot
       ansible.builtin.apt:
@@ -73,7 +70,7 @@
     
     - name: Всеотец
       ansible.builtin.shell: 
-        cmd: 'certbot certonly --email {{ email }} --agree-tos True --non-interactive True --preffered-challenges http -d "{{ domain }}"'
+        cmd: 'certbot certonly --nginx --email {{ email }} --agree-tos --non-interactive -d "{{ domain }}"'
       register: certbot_output
 
     - name: Вывод сертбота
@@ -82,7 +79,7 @@
 
     - name: Копирование systemd демонов сертбота
       ansible.builtin.copy:
-        src: /home/northernblow/prog/vm-setup/src/uberserver/systemd/
+        src: /home/northernblow/prog/vm-setup/files/uberserver/systemd/
         dest: /etc/systemd/system/
         mode: '644'
         owner: root
@@ -99,6 +96,16 @@
       ansible.builtin.service:
         name: certbot-semi-automatic.timer
         enabled: true
+        state: started
+
+    - name: Перезагрузить нжинкс для применения конфигурации
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+    - name: Убедиться что нжинкс стартанул
+      ansible.builtin.service:
+        name: nginx
         state: started
 
     - name: Print message
