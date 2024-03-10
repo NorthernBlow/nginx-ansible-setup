@@ -14,11 +14,6 @@
 
   tasks:
 
-    - name: Обновление системы
-      ansible.builtin.apt:
-        update_cache: true
-        upgrade: dist
-
     - name: Убедиться что нжинкс последней версии
       ansible.builtin.apt:
         name: nginx
@@ -33,7 +28,7 @@
 
     - name: Установка конфига нжинкс
       ansible.builtin.copy:
-        src: files/uberserver/nginx/sites-available/sitename.conf
+        src: files/{{ server }}/nginx/sites-available/sitename.conf
         dest: /etc/nginx/sites-available/
         mode: '644'
         owner: root
@@ -98,15 +93,15 @@
         enabled: true
         state: started
 
-    - name: Перезагрузить нжинкс для применения конфигурации
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded
-
     - name: Убедиться что нжинкс стартанул
       ansible.builtin.service:
         name: nginx
         state: started
+
+    - name: Перезагрузить нжинкс для применения конфигурации
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
 
     - name: Print message
       ansible.builtin.debug:
