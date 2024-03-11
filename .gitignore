@@ -4,3 +4,6 @@
 .env
 .secret
 /roles/
+venv
+/venv
+venv/*
