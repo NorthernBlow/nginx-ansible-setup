@@ -10,16 +10,15 @@
     cli_certbot_path: "/etc/letsencrypt/cli.ini"
 
   vars_files:
-    - "vars/{{ server }}.yml"
+    - "vars/{{ inventory_hostname if molecule_file is not defined else 'molecule' }}.yml"
 
   tasks:
 
-    - name: Убедиться что нжинкс последней версии
+    - name: Установка nginx и certbot
       ansible.builtin.apt:
-        name: nginx
-        state: present
-        install_recommends: true
-        allow_downgrade: false
+        pkg:
+          - nginx
+          - python3-certbot-nginx
 
     - name: Основной конфиг нжинкс
       ansible.builtin.copy:
@@ -56,17 +55,12 @@
         owner: root
         group: root
         state: link
-
-    - name: Установка certbot
-      ansible.builtin.apt:
-        name: python3-certbot-nginx
-        state: present
-        install_recommends: true
-    
+   
     - name: Всеотец
       ansible.builtin.shell: 
-        cmd: 'certbot certonly --nginx --email {{ email }} --agree-tos --non-interactive -d "{{ domain }}"'
+        cmd: 'certbot certonly --webroot -w /var/www/html/ --email {{ email }} --agree-tos --non-interactive -d "{{ domain }}"'
       register: certbot_output
+      notify: restart nginx
 
     - name: Вывод сертбота
       ansible.builtin.debug:
