@@ -1,0 +1,6 @@
+---
+ssl_certificate: ''
+ssl_certificate_key: ''
+ssl: ''
+source: template/sitename.conf.j2
+domain: test.shithappens.ru

@@ -1,0 +1,38 @@
+---
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+platforms:
+  - name: instance-${PSEUDO_ID:-123}
+    image: "jrei/systemd-ubuntu:22.04"
+    cgroupns_mode: "host"
+    command: "/lib/systemd/systemd"
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    capabilities:
+      - "SYS_ADMIN"
+    tmpfs:
+      - "/run"
+      - "/run/lock"
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    converge: ../../playbook.yml
+  config_options:
+    defaults:
+      interpreter_python: auto_silent
+    ssh_connection:
+      pipelining: false
+verifier:
+  name: testinfra
+  additional_files_or_dirs:
+    - ../../../testinfra_all.py

@@ -10,15 +10,21 @@
     cli_certbot_path: "/etc/letsencrypt/cli.ini"
 
   vars_files:
+    - vars/common.yml
     - "vars/{{ inventory_hostname if molecule_file is not defined else 'molecule' }}.yml"
 
   tasks:
+
+    - name: Тест inventory_hostname
+      ansible.builtin.debug:
+        msg: 'vars/{{ inventory_hostname }}.yml'
 
     - name: Установка nginx и certbot
       ansible.builtin.apt:
         pkg:
           - nginx
-          - python3-certbot-nginx
+          - certbot
+        update_cache: true
 
     - name: Основной конфиг нжинкс
       ansible.builtin.copy:
@@ -27,12 +33,12 @@
 
     - name: Установка конфига нжинкс
       ansible.builtin.copy:
-        src: files/{{ server }}/nginx/sites-available/sitename.conf
+        #        src: files/{{ server }}/nginx/sites-available/sitename.conf
+        src: "{{ source }}"
         dest: /etc/nginx/sites-available/
         mode: '644'
         owner: root
         group: root
-        # форсируем, чтобы затереть дефолтные конфиги.
 
     - name: Деплой сайта
       ansible.builtin.copy:
@@ -61,10 +67,12 @@
         cmd: 'certbot certonly --webroot -w /var/www/html/ --email {{ email }} --agree-tos --non-interactive -d "{{ domain }}"'
       register: certbot_output
       notify: restart nginx
+      tags: molecule-notest
 
     - name: Вывод сертбота
       ansible.builtin.debug:
         var: certbot_output.results
+      tags: molecule-notest
 
     - name: Копирование systemd демонов сертбота
       ansible.builtin.copy:
@@ -87,15 +95,11 @@
         enabled: true
         state: started
 
-    - name: Убедиться что нжинкс стартанул
-      ansible.builtin.service:
-        name: nginx
-        state: started
 
     - name: Перезагрузить нжинкс для применения конфигурации
       ansible.builtin.service:
         name: nginx
-        state: reloaded
+        state: restarted
 
     - name: Print message
       ansible.builtin.debug:

@@ -1,0 +1,27 @@
+server  {
+        listen 80;
+        listen [::]:80;
+
+        server_name {{ domain }};
+        return 301 https://$host$request_uri;
+
+        access_log /var/log/nginx/{{ domain }}-access.log main;
+        error_log /var/log/nginx/{{ domain }}-error.log warn;
+}
+
+server  {
+        listen 443 {{ ssl }};
+        listen [::]:443 {{ ssl }};
+
+        server_name {{ domain }};
+
+        root /var/www/html;
+        index MotherfuckingWebsite.html;
+
+        {{ ssl_certificate }}
+        {{ ssl_certificate_key }}
+
+        access_log /var/log/nginx/{{ domain }}-access.log main;
+        error_log /var/log/nginx/{{ domain }}-error.log warn;
+}
+
