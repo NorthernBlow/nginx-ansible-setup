@@ -4,6 +4,7 @@
   hosts: all
   gather_facts: true
   gather_subset: [all, virtual]
+  no_log: false
   vars:
     server: "{{ inventory_hostname }}"
     email: "root@rooted.onion"
@@ -32,13 +33,17 @@
         dest: /etc/nginx/
 
     - name: Установка конфига нжинкс
-      ansible.builtin.copy:
+      ansible.builtin.template:
         #        src: files/{{ server }}/nginx/sites-available/sitename.conf
         src: "{{ source }}"
-        dest: /etc/nginx/sites-available/
+        dest: /etc/nginx/sites-available/sitename.conf
         mode: '644'
         owner: root
         group: root
+
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ source }}"
 
     - name: Деплой сайта
       ansible.builtin.copy:
@@ -66,7 +71,8 @@
       ansible.builtin.shell: 
         cmd: 'certbot certonly --webroot -w /var/www/html/ --email {{ email }} --agree-tos --non-interactive -d "{{ domain }}"'
       register: certbot_output
-      notify: restart nginx
+      notify:
+        - restart nginx
       tags: molecule-notest
 
     - name: Вывод сертбота
@@ -76,7 +82,7 @@
 
     - name: Копирование systemd демонов сертбота
       ansible.builtin.copy:
-        src: /home/northernblow/prog/vm-setup/files/uberserver/systemd/
+        src: files/uberserver/systemd/
         dest: /etc/systemd/system/
         mode: '644'
         owner: root
@@ -104,3 +110,6 @@
     - name: Print message
       ansible.builtin.debug:
         msg: Hello world
+
+  handlers:
+    - import_tasks: handlers/main.yml
