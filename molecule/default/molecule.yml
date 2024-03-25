@@ -35,4 +35,4 @@ provisioner:
 verifier:
   name: testinfra
   additional_files_or_dirs:
-    - ../../../testinfra_all.py
+    - ../../../testinfra_nginx.py

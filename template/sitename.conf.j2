@@ -3,13 +3,15 @@ server  {
         listen [::]:80;
 
         server_name {{ domain }};
-        return 301 https://$host$request_uri;
+        {% if is_ssl %}return 301 https://$host$request_uri;{% endif %}
+        root /var/www/html;
+        index MotherfuckingWebsite.html;
 
         access_log /var/log/nginx/{{ domain }}-access.log main;
         error_log /var/log/nginx/{{ domain }}-error.log warn;
 }
 
-server  {
+{% if is_ssl %}server  {
         listen 443 {{ ssl }};
         listen [::]:443 {{ ssl }};
 
@@ -23,5 +25,5 @@ server  {
 
         access_log /var/log/nginx/{{ domain }}-access.log main;
         error_log /var/log/nginx/{{ domain }}-error.log warn;
-}
+}{% endif %}
 
