@@ -2,6 +2,7 @@
 ### TEST FOR NGINX, NGINX CONFIG, CERTBOT AND WHY ARE YOU LOOCKING AT??????????? ####
 #####################################################################################
 import pytest
+import os
 
 
 def test_nginx_is_installed(host):
@@ -26,8 +27,19 @@ def test_nginx_site_been(host):
     assert host.socket("tcp://0.0.0.0:80").is_listening
     assert host.socket("tcp://0.0.0.0:443").is_listening
 
-def nginx_is_working_optimized(host):
+def test_nginx_is_working_optimized(host):
     workers = host.process.filter(ppid=host.process.get(user="root", comm="nginx"))
     assert len(workers) < 10
     assert sum([w.pmem for w in workers]) < 2
 
+def test_certbot_is_successfully(host):
+    cmd = host.run("ls /etc/letsencrypt/")
+
+    assert cmd.rc == 0
+
+
+def test_certbot_daemons(host):
+    certbot_timer = host.service("certbot-semi-automatic.timer")
+
+    assert certbot_timer.is_running
+    assert certbot_timer.is_enabled

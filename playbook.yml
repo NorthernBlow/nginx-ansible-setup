@@ -8,7 +8,7 @@
   vars:
     server: "{{ inventory_hostname }}"
     email: "root@rooted.onion"
-    certificate_path: "/etc/letsencrypt/live{{ domain }}/fullchain.pem"
+    certificate_path: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
     # is_ssl: "{{ lookup('file', '/etc/letsencrypt/live/{{ domain }}/fullchain.pem') }}"
 
   vars_files:
