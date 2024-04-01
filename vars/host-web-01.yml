@@ -1,0 +1,6 @@
+---
+ssl_certificate: "ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;"
+ssl_certificate_key: "ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;"
+ssl: ssl
+source: template/sitename.conf.j2
+domain: host-web-01.uberlegenheit.ru

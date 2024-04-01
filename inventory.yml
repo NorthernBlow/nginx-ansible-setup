@@ -7,12 +7,32 @@ all:
           ansible_connection: ssh
           ansible_host: 'rheinhart.uberlegenheit.ru'
           ansible_port: 2216
+        host-web-01:
+          ansible_connection: ssh
+          ansible_host: 'web.uberlegenheit.ru'
+          ansible_port: 2240
     vpnservers:
       hosts:
         electronicpanacea:
           ansible_connection: ssh
           ansible_host: 'northernblow.uberlegenheit.ru'
           ansible_port: 22
+    db:
+      hosts:
+        host-db-01:
+          ansible_connection: ssh
+          ansible_host: 'db.uberlegenheit.ru'
+          ansible_port: 2230
+    pigs:
+      hosts:
+        host-db-01:
+          ansible_connection: ssh
+          ansible_host: 'db.uberlegenheit.ru'
+          ansible_port: 2230
+        host-web-01:
+          ansible_connection: ssh
+          ansible_host: 'web.uberlegenheit.ru'
+          ansible_port: 2240
   vars:
     ansible_user: 'root'
     ansible_python_interpreter: /usr/bin/python3
