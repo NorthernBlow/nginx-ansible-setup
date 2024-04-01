@@ -1,0 +1,9 @@
+---
+
+- name: Установка nginx и certbot
+  ansible.builtin.apt:
+    pkg:
+      - nginx
+      - certbot
+    state: present
+    update_cache: true
