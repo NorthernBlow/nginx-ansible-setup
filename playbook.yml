@@ -17,38 +17,38 @@
 
   tasks:
 
-    - name: Тест inventory_hostname
-      ansible.builtin.debug:
+    - name: Test inventory_hostname
+      debug:
         msg: 'vars/{{ inventory_hostname }}.yml'
     
-    - name: Тест certificate_path
-      ansible.builtin.debug:
+    - name: Test certificate_path
+      debug:
         msg: "{{ certificate_path }}"
 
-    - name: Установка nginx и certbot
-      ansible.builtin.apt:
+    - name: Installing nginx and certbot
+      apt:
         pkg:
           - nginx
           - certbot
         state: present
         update_cache: true
 
-    - name: Проверяем есть ли сертификаты вообще
-      ansible.builtin.stat:
+    - name: Check if there are any certificates at all
+      stat:
         path: "{{ certificate_path }}"
       register: cert_state
 
-    - name: Устанавливаем факт отсутствия или присутствия сертов
-      ansible.builtin.set_fact:
+    - name: Establishing the fact of absence or presence of certificates
+      set_fact:
         is_ssl: "{{ cert_state.stat.exists }}"
 
-    - name: Основной конфиг нжинкс
-      ansible.builtin.copy:
+    - name: Base nginx config
+      copy:
         src: files/uberserver/nginx/nginx.conf
         dest: /etc/nginx/
 
-    - name: Установка конфига нжинкс
-      ansible.builtin.template:
+    - name: Installing nginx configs for the sites
+      template:
         #        src: files/{{ server }}/nginx/sites-available/sitename.conf
         src: "{{ source }}"
         dest: /etc/nginx/sites-available/sitename.conf
@@ -57,26 +57,27 @@
         group: root
       vars:
         is_ssl: "{{ is_ssl != '' }}"
+        tags: molecule-idempotence-notest
 
     - name: debug
-      ansible.builtin.debug:
+      debug:
         msg: "{{ source }}"
 
-    - name: Деплой сайта
-      ansible.builtin.copy:
+    - name: Deploy site
+      copy:
         src: files/uberserver/nginx/var/www/html/
         dest: /var/www/html/
         mode: '644'
         owner: root
         group: root
 
-    - name: Удалить дефолтный симлинк
-      ansible.builtin.file:
+    - name: Delete default symlink
+      file:
         path: /etc/nginx/sites-enabled/default
         state: absent
 
-    - name: Создать симлинк на рабочий сайт
-      ansible.builtin.file:
+    - name: Define symlink on the sites-available
+      file:
         src: /etc/nginx/sites-available/sitename.conf
         dest: /etc/nginx/sites-enabled/sitename.conf
         mode: '644'
@@ -84,42 +85,44 @@
         group: root
         state: link
 
-    - name: Принудительный перезапуск нжинкс
-      ansible.builtin.service:
+    - name: Forced restart of njinx
+      service:
         name: nginx
         state: restarted
+        tags: molecule-idempotence-notest
    
-    - name: Всеотец
-      ansible.builtin.shell: 
+    - name: Creator
+      shell: 
         cmd: 'certbot certonly --webroot -w /var/www/html/ --email {{ email }} --agree-tos --non-interactive -d {{ domain }}'
       register: certbot_output
       notify:
         - restart nginx
       tags: molecule-notest
 
-    - name: Вывод сертбота
-      ansible.builtin.debug:
+    - name: certbot's output
+      debug:
         var: certbot_output.results
       tags: molecule-notest
 
-    - name: Переопрделеяем переменную is_ssl
-      ansible.builtin.set_fact:
+    - name: Redefine the variable is_ssl
+      set_fact:
         is_ssl: true
 
-    - name: Теперь подкидываем редирект и 443 порт
-      ansible.builtin.template:
+    - name: Redirect and 443 port
+      template:
         src: "{{ source }}"
         dest: /etc/nginx/sites-available/sitename.conf
         mode: '644'
         owner: root
         group: root
+        tags: molecule-idempotence-notest
 
-    - name: Дебаг переменной is_ssl
-      ansible.builtin.debug:
+    - name: Debug variable is_ssl
+      debug:
         msg: "{{ is_ssl | string }}"
 
-    - name: Копирование systemd демонов сертбота
-      ansible.builtin.copy:
+    - name: copying systemd demons of certbot
+      copy:
         src: files/uberserver/systemd/
         dest: /etc/systemd/system/
         mode: '644'
@@ -127,26 +130,28 @@
         group: root
         force: true
 
-    - name: Запуск демонов сертбота
-      ansible.builtin.service:
+    - name: launch its demons
+      service:
         name: certbot-semi-automatic
         enabled: true
         state: started
+        tags: molecule-idempotence-notest
 
-    - name: Запуск таймера сертбота
-      ansible.builtin.service:
+    - name: launch certbot's timers
+      service:
         name: certbot-semi-automatic.timer
         enabled: true
         state: started
 
 
-    - name: Перезагрузить нжинкс для применения конфигурации
-      ansible.builtin.service:
+    - name: Restart nginx for the apllying configuration
+      service:
         name: nginx
         state: restarted
+        tags: molecule-idempotence-notest
 
     - name: Print message
-      ansible.builtin.debug:
+      debug:
         msg: Hello world
 
   handlers:
