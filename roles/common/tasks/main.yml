@@ -1,7 +1,7 @@
 ---
 
-- name: Установка nginx и certbot
-  ansible.builtin.apt:
+- name: Installing nginx and certbot
+  apt:
     pkg:
       - nginx
       - certbot

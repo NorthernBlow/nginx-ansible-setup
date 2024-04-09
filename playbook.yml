@@ -1,6 +1,6 @@
 ---
 
-- name: Installing Nginx server
+- name: Installing Nginx server 
   hosts: all
   gather_facts: true
   gather_subset: [all, virtual]
@@ -25,13 +25,9 @@
       debug:
         msg: "{{ certificate_path }}"
 
-    - name: Installing nginx and certbot
-      apt:
-        pkg:
-          - nginx
-          - certbot
-        state: present
-        update_cache: true
+    - name: Installing nginx server and certbot
+      include_role:
+        name: 'roles/common'
 
     - name: Check if there are any certificates at all
       stat:
