@@ -1,0 +1,25 @@
+---
+
+gather_facts: true
+gather_subset: [all, virtual]
+no_log: false
+
+- name: All bout nginx
+  tasks:
+    - name: Installing nginx and certbot
+    apt:
+    pkg:
+      - nginx
+      - certbot
+    state: present
+    update_cache: true
+
+    - name: Check if there are any certificates at all
+    stat:
+      path: "{{ certificate_path }}"
+    register: cert_state
+
+    - name: Establishing the fact of absence or presence of certificates
+    set_fact:
+      is_ssl: "{{ cert_state.stat.exists }}"
+  

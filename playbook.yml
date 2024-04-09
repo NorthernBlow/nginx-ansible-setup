@@ -26,17 +26,8 @@
         msg: "{{ certificate_path }}"
 
     - name: Installing nginx server and certbot
-      include_role:
-        name: 'roles/common'
-
-    - name: Check if there are any certificates at all
-      stat:
-        path: "{{ certificate_path }}"
-      register: cert_state
-
-    - name: Establishing the fact of absence or presence of certificates
-      set_fact:
-        is_ssl: "{{ cert_state.stat.exists }}"
+      import_role:
+        name: 'roles/nginx'
 
     - name: Base nginx config
       copy:

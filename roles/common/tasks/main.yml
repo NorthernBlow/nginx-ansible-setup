@@ -1,9 +1,0 @@
----
-
-- name: Installing nginx and certbot
-  apt:
-    pkg:
-      - nginx
-      - certbot
-    state: present
-    update_cache: true
