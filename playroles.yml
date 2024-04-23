@@ -28,17 +28,10 @@
 
 
   post_tasks:
-
-
   - name: find some information about nginx config
     slurp:
       src: /etc/nginx/sites-available/sitename.conf
     register: nginx_config
-
-  - name: debug of nginx_config
-    debug:
-      msg: "{{ nginx_config['content'] | b64decode }}"
-
 
   - name: Installing nginx config for the sites
     template:
