@@ -1,9 +1,57 @@
 ---
 
 - hosts: webservers
+  serial: 1
+
+
+
   roles: 
     - nginx
 
+
+
+
 - hosts: vpnservers
+  serial: 2
+
+  pre_tasks:
+  - name: Test inventory_hostname
+    debug:
+      msg: 'vars/{{ domain  }}.yml'
+
+  - name: Test certificate_path
+    debug:
+      msg: "{{ certificate_path }}"
+
   roles: 
     - nginx
+
+
+  post_tasks:
+
+
+  - name: find some information about nginx config
+    slurp:
+      src: /etc/nginx/sites-available/sitename.conf
+    register: nginx_config
+
+  - name: debug of nginx_config
+    debug:
+      msg: "{{ nginx_config['content'] | b64decode }}"
+
+
+  - name: Installing nginx config for the sites
+    template:
+      #        src: files/{{ server }}/nginx/sites-available/sitename.conf
+      src: "{{ source }}"
+      dest: /etc/nginx/sites-available/sitename.conf
+      mode: '644'
+      owner: root
+      group: root
+    vars:
+      is_ssl: "{{ is_ssl != '' }}"
+    when: nginx_config['content'] | b64decode == false
+
+    
+
+
