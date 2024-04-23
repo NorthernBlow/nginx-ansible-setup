@@ -36,7 +36,6 @@ all:
   vars:
     ansible_ssh_pipelining: true
     ansible_ssh_transfer_method: piped
-    ansible_ssh_args: -o ControlMaster=auto -o ControlPersist=15min
     ansible_user: 'root'
     ansible_python_interpreter: /usr/bin/python3
     ansible_ssh_private_key_file: "../../.ssh/id_ed25519"

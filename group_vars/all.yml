@@ -1,2 +1,11 @@
 ---
-
+server: "{{ inventory_hostname }}"
+email: "root@rooted.onion"
+certificate_path: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+# is_ssl: "{{ lookup('file', '/etc/letsencrypt/live/{{ domain }}/fullchain.pem') }}"
+files_exists: "/etc/nginx/sites-available"
+ssl_certificate: ''
+ssl_certificate_key: ''
+ssl: ''
+source: ../template/sitename.conf.j2
+domain: test.shithappens.ru

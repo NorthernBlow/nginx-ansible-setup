@@ -1,6 +1,9 @@
 ---
 
 - hosts: webservers
+  roles: 
+    - nginx
 
+- hosts: vpnservers
   roles: 
     - nginx
