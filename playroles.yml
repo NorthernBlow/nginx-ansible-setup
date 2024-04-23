@@ -15,7 +15,7 @@
   serial: 2
 
   pre_tasks:
-  - name: grab info about nginx
+  - name: grab information about nginx conf
     include_role:
       name: info
   
