@@ -1,0 +1,8 @@
+---
+
+- name: find some information about nginx config
+  slurp:
+    src: /etc/nginx/sites-available/sitename.conf
+  register: nginx_config
+
+

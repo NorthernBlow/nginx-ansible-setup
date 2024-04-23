@@ -1,0 +1,14 @@
+---
+
+- name: Installing nginx config for the sites
+  template:
+    #        src: files/{{ server }}/nginx/sites-available/sitename.conf
+    src: "{{ source }}"
+    dest: /etc/nginx/sites-available/sitename.conf
+    mode: '644'
+    owner: root
+    group: root
+  vars:
+    is_ssl: "{{ is_ssl != '' }}"
+  when: nginx_config['content'] | b64decode == false
+  tags: molecule-idempotency-notest

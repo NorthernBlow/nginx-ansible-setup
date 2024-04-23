@@ -15,37 +15,16 @@
   serial: 2
 
   pre_tasks:
-  - name: Test inventory_hostname
-    debug:
-      msg: 'vars/{{ domain  }}.yml'
-
-  - name: Test certificate_path
-    debug:
-      msg: "{{ certificate_path }}"
+  - name: grab info about nginx
+    include_role:
+      name: info
+  
 
   roles: 
     - nginx
+    - createfiles
 
 
-  post_tasks:
-  - name: find some information about nginx config
-    slurp:
-      src: /etc/nginx/sites-available/sitename.conf
-    register: nginx_config
-
-  - name: Installing nginx config for the sites
-    template:
-      #        src: files/{{ server }}/nginx/sites-available/sitename.conf
-      src: "{{ source }}"
-      dest: /etc/nginx/sites-available/sitename.conf
-      mode: '644'
-      owner: root
-      group: root
-    vars:
-      is_ssl: "{{ is_ssl != '' }}"
-    when: nginx_config['content'] | b64decode == false
-    tags: molecule-idempotency-notest
-
-    
+ 
 
 
