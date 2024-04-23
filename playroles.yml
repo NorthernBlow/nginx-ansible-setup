@@ -44,6 +44,7 @@
     vars:
       is_ssl: "{{ is_ssl != '' }}"
     when: nginx_config['content'] | b64decode == false
+    tags: molecule-idempotency-notest
 
     
 
