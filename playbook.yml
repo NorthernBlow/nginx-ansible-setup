@@ -17,15 +17,6 @@
     - "vars/{{ inventory_hostname if molecule_file is not defined else 'molecule' }}.yml"
 
   tasks:
-
-    - name: Test inventory_hostname
-      debug:
-        msg: 'vars/{{ inventory_hostname }}.yml'
-    
-    - name: Test certificate_path
-      debug:
-        msg: "{{ certificate_path }}"
-
     - name: Installing nginx server and certbot
       import_role:
         name: 'roles/nginx'
@@ -46,10 +37,6 @@
       vars:
         is_ssl: "{{ is_ssl != '' }}"
         tags: molecule-idempotence-notest
-
-    - name: debug
-      debug:
-        msg: "{{ source }}"
 
     - name: Deploy site
       copy:
@@ -105,10 +92,6 @@
         group: root
         tags: molecule-idempotence-notest
 
-    - name: Debug variable is_ssl
-      debug:
-        msg: "{{ is_ssl | string }}"
-
     - name: copying systemd demons of certbot
       copy:
         src: files/uberserver/systemd/
@@ -137,10 +120,6 @@
         name: nginx
         state: restarted
         tags: molecule-idempotence-notest
-
-    - name: Print message
-      debug:
-        msg: Hello world
 
   handlers:
     - import_tasks: handlers/main.yml
