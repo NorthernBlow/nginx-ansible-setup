@@ -27,7 +27,7 @@
   post_tasks:
   - name: holder
     debug:
-      msg: "{{ ansible_task }} + {{ ansible_task.name }}"
+      msg: "{{ ansible_task.name }}"
 
 
  

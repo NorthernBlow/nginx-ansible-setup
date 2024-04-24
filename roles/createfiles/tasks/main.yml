@@ -11,4 +11,33 @@
   vars:
     is_ssl: "{{ is_ssl != '' }}"
   when: nginx_config['content'] | b64decode == false
-  tags: molecule-idempotency-notest
+  tags: molecule-idempotence-notest
+    
+- name: Deploy site
+  copy:
+    src: files/uberserver/nginx/var/www/html/
+    dest: /var/www/html/
+    mode: '644'
+    owner: root
+    group: root
+  when: nginx_config['content'] | b64decode == false
+
+- name: Delete default symlink
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Define symlink on the sites-available
+  file:
+    src: /etc/nginx/sites-available/sitename.conf
+    dest: /etc/nginx/sites-enabled/sitename.conf
+    mode: '644'
+    owner: root
+    group: root
+    state: link
+
+- name: Forced restart of njinx
+  service:
+    name: nginx
+    state: restarted
+    tags: molecule-idempotence-notest
