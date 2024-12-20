@@ -1,7 +1,7 @@
 ---
 
 - name: Installing nginx config for the sites
-  template:
+  ansible.builtin.template:
     #        src: files/{{ server }}/nginx/sites-available/sitename.conf
     src: "{{ source }}"
     dest: /etc/nginx/sites-available/sitename.conf
@@ -14,7 +14,7 @@
   tags: molecule-idempotence-notest
     
 - name: Deploy site
-  copy:
+  ansible.builtin.copy:
     src: files/uberserver/nginx/var/www/html/
     dest: /var/www/html/
     mode: '644'
@@ -23,12 +23,12 @@
   when: nginx_config['content'] | b64decode == false
 
 - name: Delete default symlink
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
 
 - name: Define symlink on the sites-available
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/sitename.conf
     dest: /etc/nginx/sites-enabled/sitename.conf
     mode: '644'
@@ -37,7 +37,7 @@
     state: link
 
 - name: Forced restart of njinx
-  service:
+  ansible.builtin.service:
     name: nginx
     state: restarted
     tags: molecule-idempotence-notest

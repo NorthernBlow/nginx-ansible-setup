@@ -22,12 +22,12 @@
         name: 'roles/nginx'
 
     - name: Base nginx config
-      copy:
+      ansible.builtin.copy:
         src: files/uberserver/nginx/nginx.conf
         dest: /etc/nginx/
 
     - name: Installing nginx configs for the sites
-      template:
+      ansible.builtin.template:
         #        src: files/{{ server }}/nginx/sites-available/sitename.conf
         src: "{{ source }}"
         dest: /etc/nginx/sites-available/sitename.conf
@@ -39,7 +39,7 @@
         tags: molecule-idempotence-notest
 
     - name: Deploy site
-      copy:
+      ansible.builtin.copy:
         src: files/uberserver/nginx/var/www/html/
         dest: /var/www/html/
         mode: '644'
@@ -47,12 +47,12 @@
         group: root
 
     - name: Delete default symlink
-      file:
+      ansible.builtin.file:
         path: /etc/nginx/sites-enabled/default
         state: absent
 
     - name: Define symlink on the sites-available
-      file:
+      ansible.builtin.file:
         src: /etc/nginx/sites-available/sitename.conf
         dest: /etc/nginx/sites-enabled/sitename.conf
         mode: '644'
@@ -61,13 +61,13 @@
         state: link
 
     - name: Forced restart of njinx
-      service:
+      ansible.builtin.service:
         name: nginx
         state: restarted
         tags: molecule-idempotence-notest
    
     - name: Creator
-      shell: 
+      ansible.builtin.shell: 
         cmd: 'certbot certonly --webroot -w /var/www/html/ --email {{ email }} --agree-tos --non-interactive -d {{ domain }}'
       register: certbot_output
       notify:
@@ -75,16 +75,16 @@
       tags: molecule-notest
 
     - name: certbot's output
-      debug:
+      ansible.builtin.debug:
         var: certbot_output.results
       tags: molecule-notest
 
     - name: Redefine the variable is_ssl
-      set_fact:
+      ansible.builtin.set_fact:
         is_ssl: true
 
     - name: Redirect and 443 port
-      template:
+      ansible.builtin.template:
         src: "{{ source }}"
         dest: /etc/nginx/sites-available/sitename.conf
         mode: '644'
@@ -93,7 +93,7 @@
         tags: molecule-idempotence-notest
 
     - name: copying systemd demons of certbot
-      copy:
+      ansible.builtin.copy:
         src: files/uberserver/systemd/
         dest: /etc/systemd/system/
         mode: '644'
@@ -102,21 +102,21 @@
         force: true
 
     - name: launch its demons
-      service:
+      ansible.builtin.service:
         name: certbot-semi-automatic
         enabled: true
         state: started
         tags: molecule-idempotence-notest
 
     - name: launch certbot's timers
-      service:
+      ansible.builtin.service:
         name: certbot-semi-automatic.timer
         enabled: true
         state: started
 
 
     - name: Restart nginx for the apllying configuration
-      service:
+      ansible.builtin.service:
         name: nginx
         state: restarted
         tags: molecule-idempotence-notest

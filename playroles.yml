@@ -2,14 +2,8 @@
 
 - hosts: webservers
   serial: 1
-
-
-
   roles: 
     - nginx
-
-
-
 
 - hosts: vpnservers
   serial: 2
@@ -18,8 +12,6 @@
   - name: grab information about nginx conf
     include_role:
       name: info
-  
-
   roles: 
     - nginx
     - createfiles
